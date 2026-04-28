@@ -1,0 +1,39 @@
+{
+  "models": [
+    {
+      "title": "coder-lg (Qwen2.5-Coder-32B)",
+      "provider": "openai",
+      "model": "coder-lg",
+      "apiBase": "http://192.168.3.5:4000/v1",
+      "apiKey": "sk-local",
+      "contextLength": 32768
+    },
+    {
+      "title": "agent (Devstral-24B)",
+      "provider": "openai",
+      "model": "agent",
+      "apiBase": "http://192.168.3.5:4000/v1",
+      "apiKey": "sk-local",
+      "contextLength": 32768
+    },
+    {
+      "title": "reason (Hermes-3-8B)",
+      "provider": "openai",
+      "model": "reason",
+      "apiBase": "http://192.168.3.5:4000/v1",
+      "apiKey": "sk-local",
+      "contextLength": 32768
+    }
+  ],
+  "tabAutocompleteModel": {
+    "title": "moe-fast",
+    "provider": "openai",
+    "model": "moe-fast",
+    "apiBase": "http://192.168.3.5:4000/v1",
+    "apiKey": "sk-local"
+  },
+  "embeddingsProvider": {
+    "provider": "transformers.js",
+    "model": "Xenova/all-MiniLM-L6-v2"
+  }
+}

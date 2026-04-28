@@ -1,0 +1,10 @@
+=== short prompt, 3 runs ===
+run 1: prompt=36t  completion=512t  TTFT=1.692s  total=17.417s  decode=32.56 tok/s  overall=29.40 tok/s
+run 2: prompt=36t  completion=512t  TTFT=0.276s  total=15.579s  decode=33.46 tok/s  overall=32.86 tok/s
+run 3: prompt=36t  completion=512t  TTFT=0.131s  total=15.437s  decode=33.45 tok/s  overall=33.17 tok/s
+=== long prompt ~32K input ===
+run 1: prompt=27613t  completion=256t  TTFT=28.047s  total=35.969s  decode=32.32 tok/s  overall=7.12 tok/s
+=== GPU ===
+index, memory.used [MiB], memory.total [MiB], utilization.gpu [%]
+0, 13909 MiB, 16311 MiB, 99 %
+1, 14020 MiB, 16311 MiB, 99 %

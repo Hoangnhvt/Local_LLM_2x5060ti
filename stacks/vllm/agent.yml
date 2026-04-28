@@ -1,0 +1,33 @@
+# Devstral-Small-24B AWQ — agent / tool-use specialist.
+# Single GPU (GPU 0). Pair with `reason` on GPU 1 for a balanced 2-model loadout.
+services:
+  vllm-agent:
+    image: ${VLLM_IMAGE:-vllm/vllm-openai:v0.8.5}
+    container_name: vllm-agent
+    restart: unless-stopped
+    networks: [brain]
+    ipc: host
+    shm_size: "8gb"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+              driver: nvidia
+              device_ids: ["0"]
+    environment:
+      HF_HOME: /models/.cache
+    volumes:
+      - ${MODELS_DIR:-/srv/models}:/models
+    command:
+      - --model=/models/agent
+      - --served-model-name=devstral-small-2505-awq
+      - --quantization=awq_marlin
+      - --dtype=float16
+      - --max-model-len=32768
+      - --gpu-memory-utilization=0.90
+      - --enable-prefix-caching
+      - --tool-call-parser=mistral
+      - --enable-auto-tool-choice
+      - --port=8000
+      - --host=0.0.0.0

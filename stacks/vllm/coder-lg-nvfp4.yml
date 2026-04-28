@@ -1,0 +1,61 @@
+# Qwen3.6-27B NVFP4 (sakamakismile/Qwen3.6-27B-NVFP4)
+#
+# Native FP4 on Blackwell (SM 120). Tensor-parallel across both 5060 Ti.
+# Requires vLLM >= 0.19 — bump VLLM_IMAGE in .env before launching.
+#
+# VRAM budget (per 16 GB GPU, TP=2):
+#   weights ~9.85 GB + runtime ~1.5 GB → ~3.4 GB headroom for KV @ FP8
+#   → ~50K usable context tokens (model native is 256K — out of reach here)
+#
+# Perf expectation on this hardware: ~25-40 tok/s decode (PCIe 3.0 x8/x8, no NVLink/P2P).
+# Reference 1× RTX PRO 6000 (96 GB) gets ~58 tok/s.
+#
+# This is the "compressed-tensors" path. The model card recommends the modelopt+MTP
+# siblings for ~1.6-1.7× more throughput when 5060-Ti-friendly checkpoints land.
+services:
+  vllm-coder-lg-nvfp4:
+    image: ${VLLM_IMAGE_NVFP4:-vllm/vllm-openai:nightly}
+    container_name: vllm-coder-lg-nvfp4
+    restart: unless-stopped
+    networks: [brain]
+    ipc: host
+    shm_size: "16gb"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+              driver: nvidia
+              count: all
+    environment:
+      HF_HOME: /models/.cache
+      VLLM_WORKER_MULTIPROC_METHOD: spawn
+      NCCL_P2P_DISABLE: "1"          # 5060 Ti has no P2P over PCIe
+      NCCL_IB_DISABLE: "1"
+      VLLM_USE_V1: "1"
+    volumes:
+      - ${MODELS_DIR:-/srv/models}:/models
+    command:
+      - --model=/models/coder-lg-nvfp4
+      - --served-model-name=Qwen3.6-27B-NVFP4
+      - --tensor-parallel-size=2
+      - --max-model-len=${NVFP4_MAX_LEN:-65536}
+      - --max-num-seqs=${NVFP4_MAX_SEQS:-1}
+      - --kv-cache-dtype=fp8
+      - --gpu-memory-utilization=${GPU_MEM_UTIL:-0.92}
+      # CUDA graphs are ON by default (~2-3x decode speedup at TP=2 over PCIe).
+      # If you push NVFP4_MAX_LEN past ~32K and OOM, set NVFP4_EAGER=--enforce-eager
+      # in .env (and leave commented otherwise — empty string here would break argparse).
+      - --uvicorn-log-level=info
+      - --enable-chunked-prefill
+      - --enable-prefix-caching
+      - --reasoning-parser=qwen3
+      - --trust-remote-code
+      - --port=8000
+      - --host=0.0.0.0
+    healthcheck:
+      test: ["CMD-SHELL", "python -c 'import urllib.request; urllib.request.urlopen(\"http://localhost:8000/health\").read()' || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 40
+      start_period: 240s

@@ -1,0 +1,39 @@
+# Hermes-3-Llama-3.1-8B (FP16) — reasoning / chat / function calling.
+# bfloat16 8B = ~16 GB, doesn't fit on a single 16 GB card with 32K KV.
+# Run TP=2 across both 5060 Ti for ~8 GB/GPU weights + headroom.
+services:
+  vllm-reason:
+    image: ${VLLM_IMAGE:-vllm/vllm-openai:latest}
+    container_name: vllm-reason
+    restart: unless-stopped
+    networks: [brain]
+    ipc: host
+    shm_size: "16gb"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+              driver: nvidia
+              count: all
+    environment:
+      HF_HOME: /models/.cache
+      NCCL_P2P_DISABLE: "1"          # no NVLink between consumer Blackwells
+      VLLM_USE_V1: "1"
+    volumes:
+      - ${MODELS_DIR:-/srv/models}:/models
+    command:
+      - --model=/models/reason
+      - --served-model-name=Hermes-3-Llama-3.1-8B
+      - --dtype=bfloat16
+      - --tensor-parallel-size=2
+      - --max-model-len=16384
+      - --max-num-seqs=8
+      - --gpu-memory-utilization=0.85
+      - --kv-cache-dtype=fp8
+      - --enforce-eager           # skip cudagraph capture; saves ~1-2 GB at ~15% throughput cost
+      - --enable-prefix-caching
+      - --tool-call-parser=hermes
+      - --enable-auto-tool-choice
+      - --port=8000
+      - --host=0.0.0.0

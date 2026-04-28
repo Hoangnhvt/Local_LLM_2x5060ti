@@ -1,0 +1,24 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "kurts-brain": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Kurt's Brain (LiteLLM)",
+      "options": {
+        "baseURL": "http://192.168.3.5:4000/v1",
+        "apiKey": "sk-local"
+      },
+      "models": {
+        "coder-lg": { "name": "Qwen2.5-Coder-32B (heavy)" },
+        "coder-md": { "name": "Qwen2.5-Coder-14B (fast)" },
+        "agent":    { "name": "Devstral-24B (agent)" },
+        "reason":   { "name": "Hermes-3-8B (chat)" },
+        "moe-fast": { "name": "DeepSeek-Coder-V2-Lite-MoE" }
+      }
+    }
+  },
+  "model": "kurts-brain/agent",
+  "small_model": "kurts-brain/reason",
+  "autoshare": false,
+  "autoupdate": false
+}

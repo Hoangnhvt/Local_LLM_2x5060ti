@@ -1,0 +1,74 @@
+# LiteLLM routing config.
+# One stable set of aliases the agents see; the underlying vLLM services may come and go.
+# Reference: https://docs.litellm.ai/docs/proxy/configs
+
+model_list:
+  # ---- heavy coder (TP=2 across both 5060 Ti) ----
+  - model_name: coder-lg
+    litellm_params:
+      model: openai/Qwen2.5-Coder-32B-Instruct-AWQ
+      api_base: http://vllm-coder-lg:8000/v1
+      api_key: dummy
+      timeout: 600
+
+  # NVFP4 — native FP4 on Blackwell, pilot. See research/nvfp4/NOTES.md.
+  - model_name: coder-lg-nvfp4
+    litellm_params:
+      model: openai/Qwen3.6-27B-NVFP4
+      api_base: http://vllm-coder-lg-nvfp4:8000/v1
+      api_key: dummy
+      timeout: 600
+
+  - model_name: coder-md
+    litellm_params:
+      model: openai/Qwen2.5-Coder-14B-Instruct-AWQ
+      api_base: http://vllm-coder-md:8000/v1
+      api_key: dummy
+      timeout: 300
+
+  - model_name: agent
+    litellm_params:
+      model: openai/devstral-small-2505-awq
+      api_base: http://vllm-agent:8000/v1
+      api_key: dummy
+      timeout: 600
+
+  - model_name: reason
+    litellm_params:
+      model: openai/Hermes-3-Llama-3.1-8B
+      api_base: http://vllm-reason:8000/v1
+      api_key: dummy
+      timeout: 300
+
+  - model_name: moe-fast
+    litellm_params:
+      model: openai/deepseek-coder-v2-lite-instruct-awq
+      api_base: http://vllm-moe-fast:8000/v1
+      api_key: dummy
+      timeout: 300
+
+  # ---- friendly aliases agents may probe for ----
+  - model_name: gpt-4o
+    litellm_params: { model: openai/Qwen2.5-Coder-32B-Instruct-AWQ, api_base: http://vllm-coder-lg:8000/v1, api_key: dummy }
+  - model_name: gpt-4o-fp4
+    litellm_params: { model: openai/Qwen3.6-27B-NVFP4, api_base: http://vllm-coder-lg-nvfp4:8000/v1, api_key: dummy }
+  - model_name: claude-3-5-sonnet-latest
+    litellm_params: { model: openai/devstral-small-2505-awq, api_base: http://vllm-agent:8000/v1, api_key: dummy }
+  - model_name: claude-3-5-haiku-latest
+    litellm_params: { model: openai/Hermes-3-Llama-3.1-8B, api_base: http://vllm-reason:8000/v1, api_key: dummy }
+
+litellm_settings:
+  drop_params: true
+  set_verbose: false
+  request_timeout: 600
+  num_retries: 1
+  telemetry: false
+
+router_settings:
+  routing_strategy: simple-shuffle
+  allowed_fails: 2
+  cooldown_time: 30
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY
+  disable_spend_logs: true

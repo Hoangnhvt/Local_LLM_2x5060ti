@@ -1,0 +1,32 @@
+# DeepSeek-Coder-V2-Lite-16B MoE (AWQ). Very high TPS — 2.4B active.
+# Single GPU (GPU 0).
+services:
+  vllm-moe-fast:
+    image: ${VLLM_IMAGE:-vllm/vllm-openai:v0.8.5}
+    container_name: vllm-moe-fast
+    restart: unless-stopped
+    networks: [brain]
+    ipc: host
+    shm_size: "8gb"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+              driver: nvidia
+              device_ids: ["0"]
+    environment:
+      HF_HOME: /models/.cache
+    volumes:
+      - ${MODELS_DIR:-/srv/models}:/models
+    command:
+      - --model=/models/moe-fast
+      - --served-model-name=deepseek-coder-v2-lite-instruct-awq
+      - --quantization=awq_marlin
+      - --dtype=float16
+      - --max-model-len=16384
+      - --gpu-memory-utilization=0.90
+      - --enable-prefix-caching
+      - --trust-remote-code
+      - --port=8000
+      - --host=0.0.0.0

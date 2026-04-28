@@ -1,0 +1,34 @@
+# Base compose: LiteLLM gateway only.
+# vLLM model services come from overlays in stacks/vllm/*.yml
+# Bring up via: bash scripts/start.sh <alias> [<alias>...]
+
+name: kurts-brain
+
+networks:
+  brain:
+    driver: bridge
+
+volumes:
+  litellm_data:
+
+services:
+  litellm:
+    image: ghcr.io/berriai/litellm:main-stable
+    container_name: brain-litellm
+    restart: unless-stopped
+    networks: [brain]
+    ports:
+      - "${LITELLM_PORT:-4000}:4000"
+    environment:
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:-sk-local}
+      LITELLM_LOG: INFO
+      STORE_MODEL_IN_DB: "False"
+    volumes:
+      - ./litellm/config.yaml:/app/config.yaml:ro
+      - litellm_data:/app/data
+    command: ["--config", "/app/config.yaml", "--port", "4000", "--num_workers", "2"]
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:4000/health/liveliness"]
+      interval: 15s
+      timeout: 5s
+      retries: 5

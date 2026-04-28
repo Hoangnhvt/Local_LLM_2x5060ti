@@ -1,0 +1,31 @@
+# Qwen2.5-Coder-14B AWQ on a single GPU (GPU 0).
+# Pair with `reason` or `moe-fast` on GPU 1.
+services:
+  vllm-coder-md:
+    image: ${VLLM_IMAGE:-vllm/vllm-openai:v0.8.5}
+    container_name: vllm-coder-md
+    restart: unless-stopped
+    networks: [brain]
+    ipc: host
+    shm_size: "8gb"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+              driver: nvidia
+              device_ids: ["0"]
+    environment:
+      HF_HOME: /models/.cache
+    volumes:
+      - ${MODELS_DIR:-/srv/models}:/models
+    command:
+      - --model=/models/coder-md
+      - --served-model-name=Qwen2.5-Coder-14B-Instruct-AWQ
+      - --quantization=awq_marlin
+      - --dtype=float16
+      - --max-model-len=${MAX_MODEL_LEN:-32768}
+      - --gpu-memory-utilization=${GPU_MEM_UTIL:-0.92}
+      - --enable-prefix-caching
+      - --port=8000
+      - --host=0.0.0.0

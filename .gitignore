@@ -1,0 +1,16 @@
+.env
+models/
+eval/runs/
+__pycache__/
+*.pyc
+.venv/
+node_modules/
+research/_inbox/*
+!research/_inbox/.gitkeep
+
+# Secrets — NEVER commit
+hosts
+*.pem
+*.key
+id_rsa*
+id_ed25519*
