@@ -11,13 +11,14 @@ model_list:
       api_key: dummy
       timeout: 600
 
-  # NVFP4 — native FP4 on Blackwell, pilot. See research/nvfp4/NOTES.md.
+  # NVFP4-MTP — native FP4 + speculative decoding on Blackwell. See research/nvfp4/NOTES.md.
   - model_name: coder-lg-nvfp4
     litellm_params:
-      model: openai/Qwen3.6-27B-NVFP4
-      api_base: http://vllm-coder-lg-nvfp4:8000/v1
+      model: openai/Qwen3.6-27B-Text-NVFP4-MTP
+      api_base: http://vllm-coder-lg-nvfp4-mtp:8000/v1
       api_key: dummy
       timeout: 600
+      default_max_tokens: 8192
 
   - model_name: coder-md
     litellm_params:
@@ -51,7 +52,7 @@ model_list:
   - model_name: gpt-4o
     litellm_params: { model: openai/Qwen2.5-Coder-32B-Instruct-AWQ, api_base: http://vllm-coder-lg:8000/v1, api_key: dummy }
   - model_name: gpt-4o-fp4
-    litellm_params: { model: openai/Qwen3.6-27B-NVFP4, api_base: http://vllm-coder-lg-nvfp4:8000/v1, api_key: dummy }
+    litellm_params: { model: openai/Qwen3.6-27B-Text-NVFP4-MTP, api_base: http://vllm-coder-lg-nvfp4-mtp:8000/v1, api_key: dummy }
   - model_name: claude-3-5-sonnet-latest
     litellm_params: { model: openai/devstral-small-2505-awq, api_base: http://vllm-agent:8000/v1, api_key: dummy }
   - model_name: claude-3-5-haiku-latest

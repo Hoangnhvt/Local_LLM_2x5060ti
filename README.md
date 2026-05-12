@@ -39,6 +39,7 @@ lower-cost concurrent loads.
 | Alias              | Model                                          | Format       | Footprint | Use |
 |--------------------|------------------------------------------------|--------------|-----------|-----|
 | `coder-lg`         | Qwen2.5-Coder-32B-Instruct                     | AWQ 4-bit    | ~20 GB (TP=2) | Primary coder |
+| `coder-lg-nvfp4`   | Qwen3.6-27B (sakamakismile/Qwen3.6-27B-NVFP4) | NVFP4        | ~19.7 GB (TP=2) | Native FP4 on Blackwell — pilot vs coder-lg |
 | `coder-md`         | Qwen2.5-Coder-14B-Instruct                     | AWQ 4-bit    | ~9 GB     | Fast iteration, single GPU |
 | `agent`            | Devstral-Small-2505 (24B, Mistral)             | AWQ 4-bit    | ~14 GB    | Tool-use / agent loops |
 | `reason`           | Hermes-3-Llama-3.1-8B                          | FP16 / AWQ   | ~16 / 6 GB| General reasoning, JSON, function calls |

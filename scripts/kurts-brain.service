@@ -1,0 +1,16 @@
+[Unit]
+Description=Kurts Brain AI Stack (coder-lg-nvfp4 + LiteLLM)
+Requires=docker.service
+After=docker.service network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/home/kurt/Kurts_brain
+EnvironmentFile=-/home/kurt/Kurts_brain/.env
+ExecStart=/bin/bash /home/kurt/Kurts_brain/scripts/start.sh coder-lg-nvfp4
+ExecStop=/bin/bash /home/kurt/Kurts_brain/scripts/stop.sh
+TimeoutStartSec=360
+
+[Install]
+WantedBy=multi-user.target
